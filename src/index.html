@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Avatar generator</title>
+
+  <link rel="stylesheet" href="app.css" />
+  <script type="module" src="app.js"></script>
+</head>
+
+<body>
+  <h1>Avatar generator</h1>
+
+  <label>
+    Input
+    <input id="inputText" />
+  </label>
+  <label>
+    Hash <input id="hash" readonly />
+  </label>
+
+  <div class="flex-row">
+    <div>
+      <h2>Canvas</span>
+        <div>
+          <canvas id="canvas" />
+        </div>
+    </div>
+
+    <div>
+      <h2>Image preview <button type="button" id="btnDownloadAvatar">Download</button></span>
+        <div><img id="avatarPreview" /></div>
+    </div>
+
+
+  </div>
+
+  <h1>Components</h1>
+  <div id="componentContainer"></div>
+
+
+  <div id="hiddenStuff">
+    <div class="flex-row">
+      <div>
+        <h2>svg editor</h2>
+        <div id="svgEditor">
+        </div>
+      </div>
+      <div>
+        <h2>img renderer</h2>
+        <img id="imgRenderer" /></div>
+    </div>
+    <a id="downloader" download />
+  </div>
+
+  </div>
+
+
+</body>
+
+</html>

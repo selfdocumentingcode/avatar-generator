@@ -1,0 +1,13 @@
+{
+    "name": "avatar-generator",
+    "source": "src/index.html",
+    "browserslist": "> 0.5%, last 2 versions, Firefox ESR, not dead",
+    "scripts": {
+        "start": "parcel",
+        "build": "parcel build"
+    },
+    "devDependencies": {
+        "parcel": "~2.5.0",
+        "parcel-reporter-static-files-copy": "~1.3.4"
+    }
+}
