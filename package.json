@@ -4,14 +4,15 @@
     "browserslist": "> 0.5%, last 2 versions, Firefox ESR, not dead",
     "homepage": "http://selfdocumentingcode.github.io/avatar-generator",
     "scripts": {
-        "start": "parcel",
-        "build": "parcel build",
+        "start": "parcel --dist-dir serve",
+        "build": "rimraf ./dist && parcel build --public-url /avatar-generator",
         "predeploy": "npm run build",
-        "deploy": "gh-pages -d build"
+        "deploy": "gh-pages -d dist"
     },
     "devDependencies": {
         "gh-pages": "^4.0.0",
         "parcel": "~2.5.0",
-        "parcel-reporter-static-files-copy": "~1.3.4"
+        "parcel-reporter-static-files-copy": "~1.3.4",
+        "rimraf": "~3.0.2"
     }
 }

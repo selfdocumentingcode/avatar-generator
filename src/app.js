@@ -1,6 +1,6 @@
 import { AvatarGenerator } from './avatarGenerator';
 import { getHash } from './utils';
-import { componentFiles, componentDir, canvasSize, defaultInput } from './config';
+import { componentFiles, componentDir, canvasSize, defaultInput, publicUrl } from './config';
 
 let componentContainerEl;
 let imgRendererEl;
@@ -88,7 +88,7 @@ async function loadComponentImages() {
         var count = componentFiles[key];
 
         for (let i = 0; i < count; i++) {
-            const imagePath = `/${componentDir}/${key}_${i}.svg`;
+            const imagePath = `${publicUrl}/${componentDir}/${key}_${i}.svg`;
 
             const res = await fetch(imagePath);
             const text = await res.text();

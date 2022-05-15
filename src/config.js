@@ -21,9 +21,10 @@ export const componentFiles = {
     body: 1,
     eye: 2,
     nosemouth: 2,
-    ear: 2
+    ear: 2,
 };
 
+export const publicUrl = process.env.NODE_ENV === 'development' ? '' : '/avatar-generator';
 export const componentDir = 'components';
 export const canvasSize = 256;
 export const defaultInput = '7e4ef0cc-cce3-4c61-be83-7091185d75d2';
