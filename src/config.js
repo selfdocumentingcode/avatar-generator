@@ -26,4 +26,4 @@ export const componentFiles = {
 
 export const componentDir = 'components';
 export const canvasSize = 256;
-export const defaultInput = 'test';
+export const defaultInput = '7e4ef0cc-cce3-4c61-be83-7091185d75d2';

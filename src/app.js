@@ -7,6 +7,7 @@ let imgRendererEl;
 let svgEditorEl;
 let canvasEl;
 let btnDownloadAvatarEl;
+let btnRandomInputEl;
 let aDownloaderEl;
 let imgAvatarPreviewEl;
 let inputTextEl;
@@ -31,14 +32,26 @@ function downloadAvatar() {
     aDownloaderEl.href = null;
 }
 
-function handleInputChange(event) {
-    const inputValue = event?.currentTarget?.value ?? '';
-
-    hash = getHash(inputValue);
+function generateNewHash(newValue) {
+    hash = getHash(newValue);
 
     hashEl.value = hash;
 
     generateAvatar();
+}
+
+function randomizeInput() {
+    const randomInput = crypto.randomUUID();
+
+    inputTextEl.value = randomInput;
+
+    generateNewHash(randomInput);
+}
+
+function handleInputChange(event) {
+    const inputValue = event?.currentTarget?.value ?? '';
+
+    generateNewHash(inputValue);
 }
 
 function queryElements() {
@@ -46,6 +59,7 @@ function queryElements() {
     imgRendererEl = document.querySelector('#imgRenderer');
     svgEditorEl = document.querySelector('#svgEditor');
     btnDownloadAvatarEl = document.querySelector('#btnDownloadAvatar');
+    btnRandomInputEl = document.querySelector('#btnRandomInput');
     aDownloaderEl = document.querySelector('#downloader');
     imgAvatarPreviewEl = document.querySelector('#avatarPreview');
     inputTextEl = document.querySelector('#inputText');
@@ -56,7 +70,7 @@ function queryElements() {
 
 function initializeStuff() {
     inputTextEl.value = defaultInput;
-    hash = getHash(defaultInput);
+    hash = getHash(inputTextEl.value);
     hashEl.value = hash;
 
     canvasEl.width = canvasSize;
@@ -64,6 +78,7 @@ function initializeStuff() {
     canvasCtx = canvasEl.getContext('2d');
 
     btnDownloadAvatarEl.addEventListener('click', downloadAvatar);
+    btnRandomInputEl.addEventListener('click', randomizeInput);
     inputTextEl.addEventListener('change', handleInputChange);
 }
 
@@ -95,7 +110,7 @@ async function renderNosemouth(generator) {
 
     initSvgEditor(`nosemouth-${nousemouthConfig.variant}`);
 
-    const newSize = applySvgTransforms({ color: nousemouthConfig.color, size: nousemouthConfig.size });
+    const newSize = applySvgTransforms({ color: nousemouthConfig.color, scale: nousemouthConfig.scale });
 
     const nousemouthX = canvasEl.width / 2 - newSize.width / 2;
     const nousemouthY = canvasEl.height / 2 - newSize.height / 2 + 8;
@@ -111,7 +126,7 @@ async function renderEyes(generator) {
     // Left eye
     initSvgEditor(`eye-${eyesConfig.variant}`);
 
-    const newLeftEyeSize = applySvgTransforms({ color: eyesConfig.color, size: eyesConfig.size });
+    const newLeftEyeSize = applySvgTransforms({ color: eyesConfig.color, scale: eyesConfig.scale });
 
     const leftEyePositionX = canvasEl.width / 2 - newLeftEyeSize.width / 2 - eyesConfig.distance;
     const leftEyePositionY = canvasEl.height / 2 - newLeftEyeSize.height / 2 + translateY;
@@ -121,7 +136,7 @@ async function renderEyes(generator) {
     // Right eye
     initSvgEditor(`eye-${eyesConfig.variant}`);
 
-    const newRightEyeSize = applySvgTransforms({ color: eyesConfig.color, size: eyesConfig.size });
+    const newRightEyeSize = applySvgTransforms({ color: eyesConfig.color, scale: eyesConfig.scale });
 
     const rightEyePositionX = canvasEl.width / 2 - newRightEyeSize.width / 2 + eyesConfig.distance;
     const rightEyePositionY = canvasEl.height / 2 - newRightEyeSize.height / 2 + translateY;
@@ -132,37 +147,35 @@ async function renderEyes(generator) {
 async function renderEars(generator) {
     const earsConfig = generator.getEarsConfig();
 
-    console.log(earsConfig);
-
-    const translateY = -92;
+    const translateY = -84;
 
     // Left ear
     initSvgEditor(`ear-${earsConfig.variant}`);
 
     const newLeftEarSize = applySvgTransforms({
         color: earsConfig.color,
-        size: earsConfig.size,
+        scale: earsConfig.scale,
         rotation: -earsConfig.rotation,
     });
 
-    const leftEyePositionX = canvasEl.width / 2 - newLeftEarSize.width / 2 - earsConfig.distance;
-    const leftEyePositionY = canvasEl.height / 2 - newLeftEarSize.height / 2 + translateY;
+    const leftEarPositionX = canvasEl.width / 2 - newLeftEarSize.width / 2 - earsConfig.distance;
+    const leftEarPositionY = canvasEl.height / 2 - newLeftEarSize.height / 2 + translateY;
 
-    await renderEditedSvgToCanvas(leftEyePositionX, leftEyePositionY);
+    await renderEditedSvgToCanvas(leftEarPositionX, leftEarPositionY);
 
     // Right ear
     initSvgEditor(`ear-${earsConfig.variant}`);
 
     const newRightEearSize = applySvgTransforms({
         color: earsConfig.color,
-        size: earsConfig.size,
+        scale: earsConfig.scale,
         rotation: earsConfig.rotation,
     });
 
-    const rightEyePositionX = canvasEl.width / 2 - newRightEearSize.width / 2 + earsConfig.distance;
-    const rightEyePositionY = canvasEl.height / 2 - newRightEearSize.height / 2 + translateY;
+    const rightEarPositionX = canvasEl.width / 2 - newRightEearSize.width / 2 + earsConfig.distance;
+    const rightEarPositionY = canvasEl.height / 2 - newRightEearSize.height / 2 + translateY;
 
-    await renderEditedSvgToCanvas(rightEyePositionX, rightEyePositionY);
+    await renderEditedSvgToCanvas(rightEarPositionX, rightEarPositionY);
 }
 
 async function renderBody(generator) {
@@ -170,12 +183,12 @@ async function renderBody(generator) {
 
     initSvgEditor('body-0');
 
-    const newBodySize = applySvgTransforms({ color: bodyConfig.color, size: bodyConfig.size });
+    const newBodySize = applySvgTransforms({ color: bodyConfig.color, scale: bodyConfig.scale });
 
     const bodyPositionX = canvasEl.width / 2 - newBodySize.width / 2;
     const bodyPositionY = canvasEl.height / 2 - newBodySize.height / 2;
 
-    await renderEditedSvgToCanvas(bodyPositionX, bodyPositionY, newBodySize.width, newBodySize.height);
+    await renderEditedSvgToCanvas(bodyPositionX, bodyPositionY);
 }
 
 async function renderSvgToImage(svgString) {
@@ -217,45 +230,52 @@ function initSvgEditor(svgId) {
 
 function applySvgTransforms(params) {
     const color = params.color;
-    const size = params.size;
+    const scale = params.scale;
     const rotation = params.rotation;
 
-    const svgElement = document.querySelector('#svg-clone');
+    const svgEl = document.querySelector('#svg-clone');
 
-    const fillable = svgElement.querySelector('[fill]');
+    const fillableEl = svgEl.querySelector('[fill]');
 
-    fillable.setAttributeNS(null, 'fill', color);
-    fillable.setAttributeNS(null, 'stroke', color);
+    fillableEl.setAttributeNS(null, 'fill', color);
+    fillableEl.setAttributeNS(null, 'stroke', color);
 
-    let fillableTransform = fillable.getAttributeNS(null, 'transform') ?? '';
+    const groupEl = svgEl.querySelector('g');
 
-    fillableTransform += ` scale(${size}, ${size})`;
+    let gTransform = groupEl.getAttributeNS(null, 'transform') ?? '';
 
-    fillable.setAttributeNS(null, 'transform', fillableTransform);
+    gTransform += ` scale(${scale})`;
 
     if (rotation) {
-        let svgElementTransform = svgElement.getAttributeNS(null, 'transform') ?? '';
+        const svgCenterX = svgEl.clientWidth / 2;
+        const svgCenterY = svgEl.clientHeight / 2;
 
-        svgElementTransform += `rotate(${rotation})`;
-
-        console.log({ svgElementTransform });
-
-        svgElement.setAttributeNS(null, 'transform', svgElementTransform);
+        gTransform += ` rotate(${rotation} ${svgCenterX} ${svgCenterY})`;
     }
 
-    const newWidth = svgElement.clientWidth * size;
-    const newHeight = svgElement.clientHeight * size;
+    groupEl.setAttributeNS(null, 'transform', gTransform);
 
-    svgElement.setAttributeNS(null, 'width', newWidth);
-    svgElement.setAttributeNS(null, 'height', newHeight);
+    // const groupElWidth = groupEl.getBBox().width;
+    // const groupElHeight = groupEl.getBBox().height;
+
+    // const newWidth = svgEl.clientWidth * scale;
+    // const newHeight = svgEl.clientHeight * scale;
+
+    const newWidth = svgEl.clientWidth * scale;
+    const newHeight = svgEl.clientHeight * scale;
+
+    svgEl.setAttributeNS(null, 'width', newWidth);
+    svgEl.setAttributeNS(null, 'height', newHeight);
 
     return {
-        width: svgElement.clientWidth,
-        height: svgElement.clientHeight,
+        width: newWidth,
+        height: newHeight,
     };
 }
 
-function setCanvasBackground(bgColor) {
+function setCanvasBackground(generator) {
+    const bgColor = generator.getBackgroundColor();
+
     canvasCtx.fillStyle = bgColor;
     canvasCtx.fillRect(0, 0, canvasEl.width, canvasEl.height);
 }
@@ -263,9 +283,7 @@ function setCanvasBackground(bgColor) {
 async function generateAvatar() {
     const generator = new AvatarGenerator(hash);
 
-    const bgColor = generator.getBackgroundColor();
-
-    setCanvasBackground(bgColor);
+    setCanvasBackground(generator);
 
     await renderBody(generator);
 
