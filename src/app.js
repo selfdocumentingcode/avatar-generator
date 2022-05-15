@@ -1,5 +1,5 @@
 import { AvatarGenerator } from './avatarGenerator';
-import { getHash } from './utils';
+import { getHash, getInputFromUrl } from './utils';
 import { componentFiles, componentDir, canvasSize, defaultInput, publicUrl } from './config';
 
 let componentContainerEl;
@@ -69,13 +69,7 @@ function queryElements() {
 }
 
 function initializeStuff() {
-    const urlInput = !!window.location.search
-        ? window.location.search
-        : window.location.pathname.length > 0
-        ? window.location.pathname
-        : undefined;
-
-    const inputValue = urlInput ? urlInput.substring(1) : defaultInput;
+    const inputValue = getInputFromUrl() ?? defaultInput;
 
     inputTextEl.value = inputValue;
     hash = getHash(inputTextEl.value);

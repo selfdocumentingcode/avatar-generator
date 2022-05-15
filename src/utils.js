@@ -12,3 +12,7 @@ export function getHash(inputString) {
 
     return Math.abs(hash);
 }
+
+export function getInputFromUrl() {
+    return window.location.search ? window.location.search.substring(1) : undefined;
+}
