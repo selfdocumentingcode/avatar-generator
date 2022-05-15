@@ -69,7 +69,15 @@ function queryElements() {
 }
 
 function initializeStuff() {
-    inputTextEl.value = defaultInput;
+    const urlInput = !!window.location.search
+        ? window.location.search
+        : window.location.pathname.length > 0
+        ? window.location.pathname
+        : undefined;
+
+    const inputValue = urlInput ? urlInput.substring(1) : defaultInput;
+
+    inputTextEl.value = inputValue;
     hash = getHash(inputTextEl.value);
     hashEl.value = hash;
 

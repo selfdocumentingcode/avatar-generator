@@ -1,6 +1,8 @@
 export function getHash(inputString) {
     let hash = 0;
-    if (inputString.length == 0) return hash;
+    if (inputString?.length == 0) return hash;
+
+    inputString = inputString.toLowerCase();
 
     for (let i = 0; i < inputString.length; i++) {
         const char = inputString.charCodeAt(i);
