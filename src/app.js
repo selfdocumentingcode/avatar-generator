@@ -106,7 +106,7 @@ async function loadComponentImages() {
 }
 
 async function renderNosemouth(generator) {
-    const nosemouthOffetY = 8;
+    const nosemouthOffsetY = 8;
 
     const nousemouthConfig = generator.getNosemouthConfig();
 
@@ -115,7 +115,7 @@ async function renderNosemouth(generator) {
     const newSize = applySvgTransforms({ color: nousemouthConfig.color, scale: nousemouthConfig.scale });
 
     const nousemouthX = canvasEl.width / 2 - newSize.width / 2;
-    const nousemouthY = canvasEl.height / 2 - newSize.height / 2 + nosemouthOffetY;
+    const nousemouthY = canvasEl.height / 2 - newSize.height / 2 + nosemouthOffsetY;
 
     await renderEditedSvgToCanvas(nousemouthX, nousemouthY);
 }
@@ -125,12 +125,12 @@ async function renderEye(eyesConfig) {
 
     initSvgEditor(`eye-${eyesConfig.variant}`);
 
-    const newLeftEyeSize = applySvgTransforms({ color: eyesConfig.color, scale: eyesConfig.scale });
+    const newEyeSize = applySvgTransforms({ color: eyesConfig.color, scale: eyesConfig.scale });
 
-    const leftEyePositionX = canvasEl.width / 2 - newLeftEyeSize.width / 2 - eyesConfig.distance;
-    const leftEyePositionY = canvasEl.height / 2 - newLeftEyeSize.height / 2 + eyeOffsetY;
+    const eyePositionX = canvasEl.width / 2 - newEyeSize.width / 2 - eyesConfig.distance;
+    const eyePositionY = canvasEl.height / 2 - newEyeSize.height / 2 + eyeOffsetY;
 
-    await renderEditedSvgToCanvas(leftEyePositionX, leftEyePositionY);
+    await renderEditedSvgToCanvas(eyePositionX, eyePositionY);
 }
 
 async function renderEyes(generator) {
@@ -268,12 +268,6 @@ function applySvgTransforms(params) {
     }
 
     groupEl.setAttributeNS(null, 'transform', gTransform);
-
-    // const groupElWidth = groupEl.getBBox().width;
-    // const groupElHeight = groupEl.getBBox().height;
-
-    // const newWidth = svgEl.clientWidth * scale;
-    // const newHeight = svgEl.clientHeight * scale;
 
     const newWidth = svgEl.clientWidth * scale;
     const newHeight = svgEl.clientHeight * scale;
