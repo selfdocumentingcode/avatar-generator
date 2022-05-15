@@ -83,19 +83,19 @@ function initializeStuff() {
 }
 
 async function loadComponentImages() {
-    for (let z = 0; z < Object.keys(componentFiles).length; z++) {
-        var key = Object.keys(componentFiles)[z];
+    for (let i = 0; i < Object.keys(componentFiles).length; i++) {
+        var key = Object.keys(componentFiles)[i];
         var count = componentFiles[key];
 
-        for (let i = 0; i < count; i++) {
-            const imagePath = `${publicUrl}/${componentDir}/${key}_${i}.svg`;
+        for (let j = 0; j < count; j++) {
+            const imagePath = `${publicUrl}/${componentDir}/${key}_${j}.svg`;
 
             const res = await fetch(imagePath);
             const text = await res.text();
 
             const svg = new DOMParser().parseFromString(text, 'text/xml').firstChild;
 
-            const svgId = `svg-${key}-${i}`;
+            const svgId = `svg-${key}-${j}`;
             svg.id = svgId;
 
             componentContainerEl.appendChild(svg);
@@ -106,6 +106,8 @@ async function loadComponentImages() {
 }
 
 async function renderNosemouth(generator) {
+    const nosemouthOffetY = 8;
+
     const nousemouthConfig = generator.getNosemouthConfig();
 
     initSvgEditor(`nosemouth-${nousemouthConfig.variant}`);
@@ -113,69 +115,79 @@ async function renderNosemouth(generator) {
     const newSize = applySvgTransforms({ color: nousemouthConfig.color, scale: nousemouthConfig.scale });
 
     const nousemouthX = canvasEl.width / 2 - newSize.width / 2;
-    const nousemouthY = canvasEl.height / 2 - newSize.height / 2 + 8;
+    const nousemouthY = canvasEl.height / 2 - newSize.height / 2 + nosemouthOffetY;
 
     await renderEditedSvgToCanvas(nousemouthX, nousemouthY);
 }
 
-async function renderEyes(generator) {
-    const eyesConfig = generator.getEyesConfig();
+async function renderEye(eyesConfig) {
+    const eyeOffsetY = -24;
 
-    const translateY = -24;
-
-    // Left eye
     initSvgEditor(`eye-${eyesConfig.variant}`);
 
     const newLeftEyeSize = applySvgTransforms({ color: eyesConfig.color, scale: eyesConfig.scale });
 
     const leftEyePositionX = canvasEl.width / 2 - newLeftEyeSize.width / 2 - eyesConfig.distance;
-    const leftEyePositionY = canvasEl.height / 2 - newLeftEyeSize.height / 2 + translateY;
+    const leftEyePositionY = canvasEl.height / 2 - newLeftEyeSize.height / 2 + eyeOffsetY;
 
     await renderEditedSvgToCanvas(leftEyePositionX, leftEyePositionY);
-
-    // Right eye
-    initSvgEditor(`eye-${eyesConfig.variant}`);
-
-    const newRightEyeSize = applySvgTransforms({ color: eyesConfig.color, scale: eyesConfig.scale });
-
-    const rightEyePositionX = canvasEl.width / 2 - newRightEyeSize.width / 2 + eyesConfig.distance;
-    const rightEyePositionY = canvasEl.height / 2 - newRightEyeSize.height / 2 + translateY;
-
-    await renderEditedSvgToCanvas(rightEyePositionX, rightEyePositionY);
 }
 
-async function renderEars(generator) {
+async function renderEyes(generator) {
+    const eyesConfig = generator.getEyesConfig();
+
+    // Left eye
+    await renderEye(eyesConfig);
+
+    // Right eye
+    const rightEyeConfig = { ...eyesConfig, distance: -eyesConfig.distance };
+    await renderEye(rightEyeConfig);
+}
+
+async function renderEar(earsConfig, bodyR) {
+    initSvgEditor(`ear-${earsConfig.variant}`);
+
+    const midPointDeg = 270;
+    const rotation = earsConfig.translateDeg - midPointDeg;
+
+    const newEarSize = applySvgTransforms({
+        color: earsConfig.color,
+        scale: earsConfig.scale,
+        rotation: rotation,
+    });
+
+    const positionX = canvasEl.width / 2 - newEarSize.width / 2;
+    const positionY = canvasEl.height / 2 - newEarSize.height / 2;
+
+    const translateDeg = earsConfig.translateDeg;
+    const translateRad = (Math.PI / 180) * translateDeg;
+
+    const translateX = (bodyR + newEarSize.width / 2) * Math.cos(translateRad);
+    const translateY = (bodyR + newEarSize.height / 2) * Math.sin(translateRad);
+
+    const newPositionX = positionX + translateX;
+    const newPositionY = positionY + translateY;
+
+    await renderEditedSvgToCanvas(newPositionX, newPositionY);
+}
+
+async function renderEars(generator, bodySize) {
     const earsConfig = generator.getEarsConfig();
 
-    const translateY = -84;
+    const bodyR = Math.round(bodySize.width / 2);
 
-    // Left ear
-    initSvgEditor(`ear-${earsConfig.variant}`);
+    // Render left ear
+    await renderEar(earsConfig, bodyR);
 
-    const newLeftEarSize = applySvgTransforms({
-        color: earsConfig.color,
-        scale: earsConfig.scale,
-        rotation: -earsConfig.rotation,
-    });
+    // Render right ear
+    // Mirror translateDeg and rotation
+    const midPointDeg = 270;
+    const rightEarTranslateDeg = earsConfig.translateDeg + 2 * (midPointDeg - earsConfig.translateDeg);
+    const rightEarRotation = -earsConfig.rotation;
 
-    const leftEarPositionX = canvasEl.width / 2 - newLeftEarSize.width / 2 - earsConfig.distance;
-    const leftEarPositionY = canvasEl.height / 2 - newLeftEarSize.height / 2 + translateY;
+    const rightEarConfig = { ...earsConfig, translateDeg: rightEarTranslateDeg, rotation: rightEarRotation };
 
-    await renderEditedSvgToCanvas(leftEarPositionX, leftEarPositionY);
-
-    // Right ear
-    initSvgEditor(`ear-${earsConfig.variant}`);
-
-    const newRightEearSize = applySvgTransforms({
-        color: earsConfig.color,
-        scale: earsConfig.scale,
-        rotation: earsConfig.rotation,
-    });
-
-    const rightEarPositionX = canvasEl.width / 2 - newRightEearSize.width / 2 + earsConfig.distance;
-    const rightEarPositionY = canvasEl.height / 2 - newRightEearSize.height / 2 + translateY;
-
-    await renderEditedSvgToCanvas(rightEarPositionX, rightEarPositionY);
+    await renderEar(rightEarConfig, bodyR);
 }
 
 async function renderBody(generator) {
@@ -189,6 +201,8 @@ async function renderBody(generator) {
     const bodyPositionY = canvasEl.height / 2 - newBodySize.height / 2;
 
     await renderEditedSvgToCanvas(bodyPositionX, bodyPositionY);
+
+    return newBodySize;
 }
 
 async function renderSvgToImage(svgString) {
@@ -285,13 +299,13 @@ async function generateAvatar() {
 
     setCanvasBackground(generator);
 
-    await renderBody(generator);
+    const bodySize = await renderBody(generator);
 
     await renderEyes(generator);
 
     await renderNosemouth(generator);
 
-    await renderEars(generator);
+    await renderEars(generator, bodySize);
 }
 
 async function app() {

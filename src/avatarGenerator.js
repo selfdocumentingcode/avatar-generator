@@ -6,16 +6,16 @@ export class AvatarGenerator {
     #generatedBgColor;
     #generatedBodyColor;
 
-    static bodyScaleRange = [-0.1, 0.1];
+    static bodyScaleRange = [0.9, 1.1];
 
-    static eyesScaleRange = [-0.4, -0.2];
+    static eyesScaleRange = [0.6, 0.8];
     static eyesDistanceRange = [24, 48];
 
-    static nousemouthScaleRange = [-0.2, 0.2];
+    static nousemouthScaleRange = [0.8, 1.2];
 
-    static earsScaleRange = [-0.4, -0.2];
-    static earsDistanceRange = [48, 64];
+    static earsScaleRange = [0.6, 0.8];
     static earsRotation = [15, 45];
+    static earsTranslateDegRange = [225, 250]; // Left ear
 
     constructor(hash) {
         this.#hash = hash;
@@ -34,7 +34,7 @@ export class AvatarGenerator {
 
         this.#generatedBodyColor = color;
 
-        const scale = this.#getValueInRangeFloat(AvatarGenerator.bodyScaleRange, salt) + 1;
+        const scale = this.#getValueInRangeFloat(AvatarGenerator.bodyScaleRange, salt);
 
         const bodyConfig = {
             color,
@@ -50,7 +50,7 @@ export class AvatarGenerator {
         const color = this.#getColor(salt, [this.#generatedBodyColor]);
         const variant = this.#getVariant('eye', salt);
 
-        const scale = this.#getValueInRangeFloat(AvatarGenerator.eyesScaleRange, salt) + 1;
+        const scale = this.#getValueInRangeFloat(AvatarGenerator.eyesScaleRange, salt);
         const distance = this.#getValueInRangeInt(AvatarGenerator.eyesDistanceRange, salt);
 
         const eyesConfig = {
@@ -69,7 +69,7 @@ export class AvatarGenerator {
         const color = this.#getColor(salt, [this.#generatedBodyColor]);
         const variant = this.#getVariant('nosemouth', salt);
 
-        const scale = this.#getValueInRangeFloat(AvatarGenerator.nousemouthScaleRange, salt) + 1;
+        const scale = this.#getValueInRangeFloat(AvatarGenerator.nousemouthScaleRange, salt);
 
         const nosemouthConfig = {
             color,
@@ -86,15 +86,15 @@ export class AvatarGenerator {
         const color = this.#getColor(salt, [this.#generatedBodyColor, this.#generatedBgColor]);
         const variant = this.#getVariant('ear', salt);
 
-        const scale = this.#getValueInRangeFloat(AvatarGenerator.earsScaleRange, salt) + 1;
-        const distance = this.#getValueInRangeInt(AvatarGenerator.earsDistanceRange, salt);
+        const scale = this.#getValueInRangeFloat(AvatarGenerator.earsScaleRange, salt);
 
         const rotation = this.#getValueInRangeInt(AvatarGenerator.earsRotation, salt);
+        const translateDeg = this.#getValueInRangeInt(AvatarGenerator.earsTranslateDegRange, salt);
 
         const earsConfig = {
             color,
             scale,
-            distance,
+            translateDeg,
             variant,
             rotation,
         };
@@ -133,9 +133,7 @@ export class AvatarGenerator {
     }
 
     #getSaltyHash(salt) {
-        const roundingFn = salt % 2 === 0 ? Math.ceil : Math.floor;
-
-        const saltyHash = Math.abs(roundingFn(this.#hash / salt));
+        const saltyHash = Math.abs( Math.round(this.#hash / salt));
 
         return saltyHash;
     }
