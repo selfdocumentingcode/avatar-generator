@@ -9,22 +9,16 @@ import {
     imgAvatarPreviewEl,
     inputTextEl,
     hashEl,
+    stageSvgEl
 } from './elementContainer';
 import { clearStage, renderBackground, renderBody, renderEars, renderEyes, renderNosemouth } from './renderFunctions';
 import { loadComponentImages } from './componentsContainer';
 
 let hash;
 
-function updatePreview() {
-
-
-    // const image = canvasEl.toDataURL('image/png');
-
-    // imgAvatarPreviewEl.src = image;
-}
-
 function downloadAvatar() {
-    const image = canvasEl.toDataURL('image/png');
+    // TODO use a canvas to conver to png
+    const image = imgAvatarPreviewEl.src;
 
     aDownloaderEl.href = image;
     aDownloaderEl.click();
@@ -67,16 +61,18 @@ function initializeStuff() {
     inputTextEl.addEventListener('change', handleInputChange);
 }
 
-async function renderSvgToImage(svgString) {
-    imgRendererEl.src = null;
+async function updatePreview() {
+    imgAvatarPreviewEl.src = null;
 
-    var svg64 = btoa(svgString);
-    var b64Start = 'data:image/svg+xml;base64,';
-    var image64 = b64Start + svg64;
+    const svgString = new XMLSerializer().serializeToString(stageSvgEl);
 
-    const imgLoadPromise = new Promise((resolve) => (imgRendererEl.onload = resolve));
+    const svg64 = btoa(svgString);
+    const b64Start = 'data:image/svg+xml;base64,';
+    const image64 = b64Start + svg64;
 
-    imgRendererEl.src = image64;
+    const imgLoadPromise = new Promise((resolve) => (imgAvatarPreviewEl.onload = resolve));
+
+    imgAvatarPreviewEl.src = image64;
 
     return imgLoadPromise;
 }
@@ -95,6 +91,8 @@ async function generateAvatar() {
      await renderNosemouth(generator);
 
      await renderEars(generator, bodySize);
+
+     updatePreview();
 }
 
 async function app() {
@@ -103,8 +101,6 @@ async function app() {
     await loadComponentImages();
 
     generateAvatar();
-
-    updatePreview();
 }
 
 window.onload = app;
