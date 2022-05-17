@@ -9,7 +9,7 @@ export class AvatarGenerator {
     static bodyScaleRange = [0.9, 1.1];
 
     static eyesScaleRange = [0.6, 0.8];
-    static eyesDistanceRange = [24, 48];
+    static eyesDistanceRange = [48, 96];
 
     static nousemouthScaleRange = [0.8, 1.2];
 
@@ -133,7 +133,7 @@ export class AvatarGenerator {
     }
 
     #getSaltyHash(salt) {
-        const saltyHash = Math.abs( Math.round(this.#hash / salt));
+        const saltyHash = Math.abs(Math.round(this.#hash / salt));
 
         return saltyHash;
     }
