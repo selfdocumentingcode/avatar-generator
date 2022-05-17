@@ -11,8 +11,6 @@ export function renderBackground(generator) {
 }
 
 export async function renderBody(generator) {
-    console.log('render body');
-
     const bodyConfig = generator.getBodyConfig();
 
     const bodyComponent = getComponentLayer('body', 0);
@@ -20,8 +18,6 @@ export async function renderBody(generator) {
     await addLayerToStage(bodyComponent); // Maybe add to temp stage and then move
 
     const newBodySize = applySvgTransforms(bodyComponent, { color: bodyConfig.color, scale: bodyConfig.scale });
-
-    console.log({ stageSvgEl, newBodySize });
 
     return newBodySize;
 }
@@ -63,8 +59,6 @@ async function renderEye(eyesConfig) {
 }
 
 export async function renderEyes(generator) {
-    console.log('render eyes');
-
     const eyesConfig = generator.getEyesConfig();
 
     // Left eye
@@ -85,31 +79,26 @@ async function renderEar(earsConfig, bodyR) {
         scale: earsConfig.scale,
     });
 
-    // const positionX = canvasEl.width / 2 - newEarSize.width / 2;
-    // const positionY = canvasEl.height / 2 - newEarSize.height / 2;
-
     const translateDeg = earsConfig.translateDeg;
     const translateRad = (Math.PI / 180) * translateDeg;
 
-    const translateX = (bodyR + newEarSize.width / 2) * Math.cos(translateRad);
-    const translateY = (bodyR + newEarSize.height / 2) * Math.sin(translateRad);
+    // const translateX = (bodyR + newEarSize.width / 2 ) * Math.cos(translateRad);
+    // const translateY = (bodyR + newEarSize.height / 2) * Math.sin(translateRad);
+
+    const translateX = ((bodyR + newEarSize.width / 2) / earsConfig.scale) * Math.cos(translateRad);
+    const translateY = ((bodyR + newEarSize.height / 2) / earsConfig.scale) * Math.sin(translateRad);
 
     applySvgTranslation(earComponent, { x: translateX, y: translateY });
-
-    // const newPositionX = positionX + translateX;
-    // const newPositionY = positionY + translateY;
 
     const midPointDeg = 270;
     const rotationDeg = earsConfig.translateDeg - midPointDeg;
 
-    applySvgRotation(earComponent, rotationDeg); 
+    applySvgRotation(earComponent, rotationDeg);
 
     return newEarSize;
 }
 
 export async function renderEars(generator, bodySize) {
-    console.log('renderEars');
-
     const earsConfig = generator.getEarsConfig();
 
     const bodyR = Math.round(bodySize.width / 2);
@@ -141,81 +130,60 @@ function applySvgTranslation(componentLayer, translation) {
 function applySvgRotation(componentLayer, rotationDeg) {
     const fillableEl = componentLayer.querySelector('[fill]');
 
-    let transform = componentLayer.getAttributeNS(null, 'transform') ?? '';
+    let transform = fillableEl.getAttributeNS(null, 'transform') ?? '';
 
-    // const svgCenterX = Math.round(scaledWidth / 2);
-    // const svgCenterY = Math.round(scaledHeight / 2);
+    // fillableEl.setAttributeNS(null, 'transform-origin', 'center');
 
-    // transform += ` rotate(${rotation} ${svgCenterX} ${svgCenterY})`;
+    const rect = fillableEl.getBoundingClientRect();
 
-    // console.log(fillableEl.getBBox());
-    // console.log(fillableEl.getBoundingClientRect());
+    const rectCenterX = rect.x + rect.width / 2;
+    const rectCenterY = rect.y + rect.height / 2;
 
-    // transform += ` rotate(${rotationDeg})`;
-    console.log(componentLayer.getBBox());
-    console.log(componentLayer.getBoundingClientRect());
+    const relativeCoords = getRelativeCoordinates(rectCenterX, rectCenterY, stageSvgEl, fillableEl);
 
-    transform += ` rotate(35)`;
+    const positionX = relativeCoords.x;
+    const positionY = relativeCoords.y;
 
-    componentLayer.setAttributeNS(null, 'transform', transform.trim());
+    transform += ` rotate(${rotationDeg} ${positionX} ${positionY})`;
+
+    fillableEl.setAttributeNS(null, 'transform', transform.trim());
 }
 
 function applySvgTransforms(componentLayer, params) {
-    const { color, scale, offsetX, offsetY } = params;
-    // const scale = 1;
+    const { color, offsetX, offsetY } = params;
+    const { scale } = params;
+    // const scale = 0.5;
 
     const fillableEl = componentLayer.querySelector('[fill]');
-
-    console.log({ params, componentLayer, fillableEl });
 
     fillableEl.setAttributeNS(null, 'fill', color);
     fillableEl.setAttributeNS(null, 'stroke', color);
 
     componentLayer.setAttributeNS(null, 'transform-origin', 'center');
 
+    const originalRect = componentLayer.getBoundingClientRect();
+
     let transform = componentLayer.getAttributeNS(null, 'transform') ?? '';
 
     transform += ` scale(${scale})`;
 
-    // componentLayer.setAttributeNS(null, 'transform', transform);
+    const originalWidth = originalRect.width;
+    const originalHeight = originalRect.height;
 
-    // console.log(componentLayer.getBBox());
-    // console.log(componentLayer.getBoundingClientRect())
+    componentLayer.setAttributeNS(null, 'transform', transform);
 
-    const width = componentLayer.getBoundingClientRect().width;
-    const height = componentLayer.getBoundingClientRect().height;
-
-    console.log({ width, height });
-
-    // const scaledWidth = Math.round(width * scale);
-    // const scaledHeight = Math.round(height * scale);
-
-    const scaledWidth = width;
-    const scaledHeight = height;
-
-    console.log({ scaledWidth, scaledHeight });
-
-    // if (rotation) {
-    //     // const svgCenterX = Math.round(scaledWidth / 2);
-    //     // const svgCenterY = Math.round(scaledHeight / 2);
-
-    //     // transform += ` rotate(${rotation} ${svgCenterX} ${svgCenterY})`;
-
-    //     transform += ` rotate(${rotation})`;
-    // }
+    const scaledWidth = componentLayer.getBoundingClientRect().width;
+    const scaledHeight = componentLayer.getBoundingClientRect().height;
 
     const stageSvgWidth = stageSvgEl.getAttributeNS(null, 'width');
     const stageSvgHeight = stageSvgEl.getAttributeNS(null, 'height');
-
-    // const translateToX = Math.round(stageSvgWidth / 2) + (offsetX ?? 0);
-    // const translateToY = Math.round(stageSvgHeight / 2) + (offsetY ?? 0);
 
     let translateToX = 0;
     let translateToY = 0;
 
     if (fillableEl.tagName === 'path') {
-        translateToX = Math.round(stageSvgWidth / 2 - scaledWidth / 2) + (offsetX ?? 0);
-        translateToY = Math.round(stageSvgHeight / 2 - scaledHeight / 2) + (offsetY ?? 0);
+        translateToX = Math.round(stageSvgWidth / 2 - originalWidth / 2) + (offsetX ?? 0);
+        translateToY = Math.round(stageSvgHeight / 2 - originalHeight / 2) + (offsetY ?? 0);
     } else {
         translateToX = Math.round(stageSvgWidth / 2) + (offsetX ?? 0);
         translateToY = Math.round(stageSvgHeight / 2) + (offsetY ?? 0);
@@ -249,4 +217,14 @@ export function clearStage() {
     Array.from(stageSvgEl.children)
         .filter((c) => c.id !== 'background-layer')
         .forEach((c) => c.remove());
+}
+
+function getRelativeCoordinates(x, y, svgContainer, svgElement) {
+    var p = svgContainer.createSVGPoint();
+    p.x = x;
+    p.y = y;
+
+    var ctm = svgElement.getScreenCTM();
+
+    return p.matrixTransform(ctm.inverse());
 }

@@ -90,11 +90,11 @@ async function generateAvatar() {
 
     const bodySize = await renderBody(generator);
 
-    // await renderEyes(generator);
+     await renderEyes(generator);
 
-    // await renderNosemouth(generator);
+     await renderNosemouth(generator);
 
-    await renderEars(generator, bodySize);
+     await renderEars(generator, bodySize);
 }
 
 async function app() {
