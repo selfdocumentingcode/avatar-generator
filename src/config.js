@@ -26,5 +26,5 @@ export const componentFiles = {
 
 export const publicUrl = process.env.NODE_ENV === 'development' ? '' : '/avatar-generator';
 export const componentDir = 'components';
-export const canvasSize = 256;
+export const avatarSize = 256;
 export const defaultInput = '6b63bc2e-2984-4da2-b7a9-b9fe671ce986';
