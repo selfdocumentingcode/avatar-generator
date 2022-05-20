@@ -11,7 +11,7 @@ import {
     stageSvgEl,
     canvasPreviewEl,
 } from './elementContainer';
-import { clearStage, renderBackground, renderBody, renderEars, renderEyes, renderNosemouth } from './renderFunctions';
+import { renderBackground, renderBody, renderEars, renderEyes, renderNosemouth } from './renderFunctions';
 import { loadComponentImages } from './componentsContainer';
 
 let hash;
@@ -115,6 +115,12 @@ async function app() {
     await loadComponentImages();
 
     generateAvatar();
+}
+
+function clearStage() {
+    Array.from(stageSvgEl.children)
+        .filter((c) => c.id !== 'background-layer')
+        .forEach((c) => c.remove());
 }
 
 window.onload = app;
