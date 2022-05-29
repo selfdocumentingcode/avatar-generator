@@ -1,4 +1,4 @@
-import { stageSvgEl } from './elementContainer';
+import { stageSvgEl, snapshotContainerEl } from './elementContainer';
 import { getComponentLayer } from './componentsContainer';
 import {
     addLayerToStage,
@@ -6,7 +6,7 @@ import {
     applySvgTransforms,
     addLayerToStage,
     applySvgFlipHorizontal,
-    applySvgRotation
+    applySvgRotation,
 } from './svgFunctions';
 
 export function renderBackground(generator) {
@@ -16,6 +16,8 @@ export function renderBackground(generator) {
 
     backgroundRect.setAttributeNS(null, 'fill', bgColor);
     backgroundRect.setAttributeNS(null, 'stroke', bgColor);
+
+    saveSnapshot('background');
 }
 
 export async function renderBody(generator) {
@@ -25,7 +27,11 @@ export async function renderBody(generator) {
 
     await addLayerToStage(bodyComponent); // Maybe add to temp stage and then move
 
+    saveSnapshot('body1');
+
     const newBodySize = applySvgTransforms(bodyComponent, { color: bodyConfig.color, scale: bodyConfig.scale });
+
+    saveSnapshot('body2');
 
     return newBodySize;
 }
@@ -39,11 +45,15 @@ export async function renderNosemouth(generator) {
 
     await addLayerToStage(nosemouthComponent);
 
+    saveSnapshot('noseMouth1');
+
     const newSize = applySvgTransforms(nosemouthComponent, {
         color: nousemouthConfig.color,
         scale: nousemouthConfig.scale,
         offsetY: nosemouthOffsetY,
     });
+
+    saveSnapshot('noseMouth2');
 
     return newSize;
 }
@@ -52,6 +62,8 @@ async function renderEye(eyesConfig) {
     const eyeComponent = getComponentLayer('eye', eyesConfig.variant);
 
     await addLayerToStage(eyeComponent);
+
+    saveSnapshot('eye1');
 
     const eyeOffsetY = -24;
     const eyeOffsetX = Math.round(eyesConfig.distance / 2);
@@ -62,6 +74,8 @@ async function renderEye(eyesConfig) {
         offsetX: eyeOffsetX,
         offsetY: eyeOffsetY,
     });
+
+    saveSnapshot('eye2');
 
     return newEyeSize;
 }
@@ -85,15 +99,21 @@ async function renderEar(earsConfig, bodyR, flipHorizontal) {
 
     await addLayerToStage(earComponent);
 
+    saveSnapshot('ear1');
+
     if (flipHorizontal) {
         applySvgFlipHorizontal(earComponent);
-    }
+
+        saveSnapshot('ear2');
+    }   
 
     const newEarSize = applySvgTransforms(earComponent, {
         color: earsConfig.color,
         scale: earsConfig.scale,
-        flipHorizontal
+        flipHorizontal,
     });
+
+    saveSnapshot('ear3');
 
     const translateDeg = earsConfig.translateDeg;
     const translateRad = (Math.PI / 180) * translateDeg;
@@ -101,16 +121,20 @@ async function renderEar(earsConfig, bodyR, flipHorizontal) {
     let translateX = ((bodyR + newEarSize.width / 2) / earsConfig.scale) * Math.cos(translateRad);
     const translateY = ((bodyR + newEarSize.height / 2) / earsConfig.scale + earOffsetY) * Math.sin(translateRad);
 
-    if(flipHorizontal) translateX = -translateX;
+    if (flipHorizontal) translateX = -translateX;
 
     applySvgTranslation(earComponent, { x: translateX, y: translateY });
 
-    const midPointDeg = 270;
-    let rotationDeg = earsConfig.translateDeg - midPointDeg; 
+    saveSnapshot('ear4');
 
-    if(flipHorizontal) rotationDeg = -rotationDeg;
+    const midPointDeg = 270;
+    let rotationDeg = earsConfig.translateDeg - midPointDeg;
+
+    if (flipHorizontal) rotationDeg = -rotationDeg;
 
     applySvgRotation(earComponent, rotationDeg);
+
+    saveSnapshot('ear5');
 
     return newEarSize;
 }
@@ -134,4 +158,15 @@ export async function renderEars(generator, bodySize) {
     const rightEarConfig = { ...earsConfig, translateDeg: rightEarTranslateDeg };
 
     await renderEar(rightEarConfig, bodyR, true);
+}
+
+function saveSnapshot(caption = '') {
+    const snapshotElement = document.createElement('div');
+    snapshotElement.classList.add('snapshot');
+
+    const stageSnapshotEl = stageSvgEl.cloneNode(true);
+
+    snapshotElement.append(stageSnapshotEl, caption);
+
+    snapshotContainerEl.prepend(snapshotElement);
 }

@@ -10,6 +10,7 @@ import {
     hashEl,
     stageSvgEl,
     canvasPreviewEl,
+    snapshotContainerEl,
 } from './elementContainer';
 import { renderBackground, renderBody, renderEars, renderEyes, renderNosemouth } from './renderFunctions';
 import { loadComponentImages } from './componentsContainer';
@@ -120,6 +121,9 @@ async function app() {
 function clearStage() {
     Array.from(stageSvgEl.children)
         .filter((c) => c.id !== 'background-layer')
+        .forEach((c) => c.remove());
+
+    Array.from(snapshotContainerEl.children)
         .forEach((c) => c.remove());
 }
 

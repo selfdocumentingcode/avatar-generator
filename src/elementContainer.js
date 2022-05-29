@@ -1,6 +1,7 @@
 export let stageWrapperEl;
 export let stageSvgEl;
 export let componentContainerEl;
+export let snapshotContainerEl;
 export let btnDownloadAvatarEl;
 export let btnRandomInputEl;
 export let aDownloaderEl;
@@ -12,6 +13,7 @@ export function queryElements() {
     stageWrapperEl = document.querySelector('#stageWrapper');
     stageSvgEl = document.querySelector('#stageSvg');
     componentContainerEl = document.querySelector('#componentContainer');
+    snapshotContainerEl = document.querySelector('#snapshotContainer');
     btnDownloadAvatarEl = document.querySelector('#btnDownloadAvatar');
     btnRandomInputEl = document.querySelector('#btnRandomInput');
     aDownloaderEl = document.querySelector('#downloader');

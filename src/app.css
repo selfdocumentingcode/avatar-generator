@@ -1,4 +1,4 @@
-#componentContainer {
+#componentContainer, #snapshotContainer {
     overflow: auto;
 }
 
@@ -24,6 +24,16 @@
 
 #stageWrapper {
     position: relative;
+}
+
+#snapshotContainer {
+    display: flex;
+}
+
+.snapshot {
+    border-right: 1px solid black;
+    padding: 0.5em;
+    text-align: center;
 }
 
 .centerIndicatorX {
